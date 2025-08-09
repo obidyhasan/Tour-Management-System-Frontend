@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Password from "@/components/ui/Password";
+import config from "@/config";
 import { cn } from "@/lib/utils";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,23 +34,30 @@ export function LoginForm({
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "obidyhasan@gmail.com",
+      password: "Obidy@12",
     },
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
       const result = await login(data).unwrap();
+
+      if (result.success) {
+        toast.success("Logged in successfully");
+        navigate("/");
+      }
+
       console.log(result);
     } catch (error: any) {
       console.log(error);
 
-      if (
-        error.status === 401 &&
-        error?.data?.message === "User is not verified"
-      ) {
-        toast.error(error?.data?.message);
+      if (error.data.message === "Password does not match") {
+        toast.error("Invalid credentials");
+      }
+
+      if (error.data.message === "User is not verified") {
+        toast.error("Your account is not verified");
         navigate("/verify", { state: data.email });
       }
     }
@@ -111,6 +119,7 @@ export function LoginForm({
           </span>
         </div>
         <Button
+          onClick={() => window.open(`${config.baseUrl}/auth/google`)}
           type="button"
           variant="outline"
           className="w-full cursor-pointer"
