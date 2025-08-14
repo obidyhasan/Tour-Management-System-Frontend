@@ -19,3 +19,27 @@ export interface ISidebarItem {
 }
 
 export type TRole = "SUPER_ADMIN" | "ADMIN" | "USER";
+
+type ZodIssue = {
+  code: string;
+  expected: string;
+  received: string;
+  path: string[];
+  message: string;
+};
+
+type ErrorSource = {
+  path: string;
+  message: string;
+};
+
+export interface IErrorResponse {
+  success: boolean;
+  message: string;
+  errorSource?: ErrorSource[];
+  err?: {
+    issues: ZodIssue[];
+    name: string;
+  };
+  stack?: string;
+}
